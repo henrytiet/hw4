@@ -1,6 +1,6 @@
 /*
   Henry Tiet — Portfolio stylesheet (shared by all pages)
-  Repository: https://github.com/henrytiet/cse134bhw3
+  Repository: https://github.com/henrytiet/hw4
 */
 
 /* ===== Custom properties ===== */
@@ -11,11 +11,53 @@
   --color-hold: #d2601a;      /* orange accent */
   --color-rope: #17707a;      /* teal accent, links */
   --color-focus: #ffd23f;
+  --color-error: #b3261e;     /* invalid field border */
+  --color-success: #1b7a3d;   /* valid field border */
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-heading: "Trebuchet MS", "Segoe UI", sans-serif;
   --content-width: 60rem;
   --space: 1rem;
   --radius: 0.75rem;
+}
+
+:root {
+  color-scheme: light; /* tells the browser how to draw native controls and scrollbars */
+}
+
+/* Dark theme: theme.js sets data-theme="dark" on <html>. Only the color
+   variables change; every rule below keeps using the same variable names. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-sky: #12202a;
+  --color-wall: #e8eef1;
+  --color-card: #1e3040;
+  --color-hold: #f2a065;
+  --color-rope: #6fd0dc;
+  --color-error: #ff8a80;
+  --color-success: #6fdc8c;
+}
+
+/* ===== View transitions ===== */
+/* Cross-fade between pages when following a link on this site, and make the
+   theme switch's cross-fade (started in theme.js) slow enough to notice.
+   People who ask for reduced motion get no animation at all. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.4s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 /* ===== Base / typography ===== */
@@ -78,6 +120,15 @@ footer {
   max-width: var(--content-width);
   margin: 0 auto;
   padding: var(--space);
+}
+
+/* Navigation on the left, theme button on the right; they stack when space runs out */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--space) * 0.75);
 }
 
 /* Child combinator: only the list directly inside a nav becomes a flex row */
@@ -151,6 +202,102 @@ dialog form {
   margin: 0;
 }
 
+/* HW4 contact form: one flex column, with each label stacked above its control */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  max-width: 36rem;
+  padding: var(--space);
+  background-color: var(--color-card);
+  border: 2px solid var(--color-rope);
+  border-radius: var(--radius);
+}
+
+.contact-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.contact-form label {
+  font-weight: 700;
+}
+
+.contact-form .hint {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.contact-form textarea {
+  resize: vertical; /* sideways resizing could push the page wider than the screen */
+}
+
+/* Validation states. :user-invalid and :user-valid only match after the person
+   has edited a field or tried to submit, so nothing looks wrong on first load.
+   Only colors and a background mark change, and the space for the mark is
+   always reserved, so nothing shifts. The mark means color is not the only cue. */
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+  padding-right: 2.25em;
+  background-color: var(--color-card);
+  background-repeat: no-repeat;
+  background-position: right 0.6em top 0.6em;
+  background-size: 1.2em;
+}
+
+.contact-form :is(input, textarea):user-invalid {
+  border-color: var(--color-error);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23b3261e'/%3E%3Cpath d='M8 8l8 8M16 8l-8 8' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.contact-form :is(input, textarea):user-valid {
+  border-color: var(--color-success);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%231b7a3d'/%3E%3Cpath d='M7 12.5l3.5 3.5L17 9' fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Message areas on the JavaScript form */
+[hidden] {
+  display: none !important; /* keeps hidden areas hidden until form.js reveals them */
+}
+
+.form-message {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--color-rope);
+  border-left-width: 0.5rem;
+  border-radius: 0.4em;
+}
+
+.form-message p,
+.form-message ul {
+  margin: 0;
+}
+
+.form-message-title {
+  font-weight: 700;
+}
+
+.form-message-error {
+  border-color: var(--color-error);
+}
+
+/* Character counter: part of the hint sentence above the comments box.
+   Near the limit it turns bold (the message also starts with "Warning"). */
+.count-warning {
+  font-weight: 700;
+}
+
+/* At the limit: bold and underlined. Not an error, so not red. */
+.count-limit {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.contact-form button {
+  align-self: flex-start;
+}
+
 fieldset {
   background-color: var(--color-card);
   border: 2px solid var(--color-rope);
@@ -175,6 +322,8 @@ textarea {
   width: 100%;
   padding: 0.5em;
   font: inherit;
+  color: var(--color-wall);
+  background-color: var(--color-card);
   border: 2px solid var(--color-wall);
   border-radius: 0.4em;
 }
