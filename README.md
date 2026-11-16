@@ -1,2 +1,2 @@
-| Repository URL | https://github.com/henrytiet/hw4 |
-| Part 1 Deployed URL | https://henryhw4.netlify.app/ |
+Repository:  https://github.com/henrytiet/hw4 
+Website:  https://henryhw4.netlify.app/ 
